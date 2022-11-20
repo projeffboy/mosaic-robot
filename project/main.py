@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Module to play sounds when the touch sensor is pressed.
-This file must be run on the robot.
+Run this file to run the robot
 """
  
 from utils.brick import Motor
