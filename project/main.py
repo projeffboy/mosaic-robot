@@ -7,33 +7,37 @@ Run this file to run the robot
 from utils.brick import Motor
 from time import sleep
 from utils.brick import TouchSensor, wait_ready_sensors
+from button_input import button_input
 
-TOUCH_SENSOR1 = TouchSensor(1)
-TOUCH_SENSOR2 = TouchSensor(2)
+# INIT I/O
+DRAW_0_BTN = TouchSensor(1)
+DRAW_1_BTN = TouchSensor(2)
+PUSHER = Motor("A")
+SWEEPER = Motor("D")
+wait_ready_sensors(True) # set to True to print out helpful stuff
+PUSHER.offset_encoder(0)
+SWEEPER.offset_encoder(0)
 
-
-motor1 = Motor("A")
-motor2 = Motor("D")
-
-# CONFIGS
-init_D_y = 3
-init_D_x = 16
-radius_big = 2.1
-pixel_width = 4
-pixel_height = 4
-pi = 3.14159264
-num_col = 5
-num_row = 5
-num_pixels = num_col * num_row
+# CONFIG
+BTN_POLLING_PERIOD = 0.5
+INIT_D_Y = 3
+INIT_D_X = 16
+RADIUS_BIG = 2.1
+PIXEL_WIDTH_CM = 4
+PIXEL_HEIGHT_CM = 4
+PI = 3.14159264
+NUM_COL = 5
+NUM_ROW = 5
+NUM_PIXELS = NUM_COL * NUM_ROW
 
 def piston_x_axis(pixel_slot):
-    init_distance = init_D_x
-    if (pixel_slot < 0 or pixel_slot > num_col):
+    init_distance = INIT_D_X
+    if (pixel_slot < 0 or pixel_slot > NUM_COL):
         print(pixel_slot + " is an invalid pixel column slot.")
         exit()
     try:
-        #pushing_distance = init_distance + ((pixel_slot) * pixel_width)
-        #rotation_in_degrees = (360 * pushing_distance)/(2*pi*radius_big)
+        # pushing_distance = init_distance + ((pixel_slot) * PIXEL_WIDTH_CM)
+        # rotation_in_degrees = (360 * pushing_distance)/(2*PI*RADIUS_BIG)
         if (pixel_slot == 0):
             rotation_in_degrees = 436
         elif (pixel_slot == 1):
@@ -47,19 +51,19 @@ def piston_x_axis(pixel_slot):
         else :
             print("Incorrect index for col.")
             exit()
-        move_piston(rotation_in_degrees, motor1)
+        move_piston(rotation_in_degrees, PUSHER)
     except BaseException as e:
         print(e)
         exit()
 
 def piston_y_axis(row_slot):
-    init_distance = init_D_y
+    init_distance = INIT_D_Y
     #if (row_slot < 0 or row_slot >= num_row):
         #print(str(row_slot) + " is an invalid pixel row slot.")
         #exit()
     try:
         #pushing_distance = init_distance + ((row_slot) * pixel_width)
-        #rotation_in_degrees = (360 * pushing_distance)/(2*pi*radius_big)
+        #rotation_in_degrees = (360 * pushing_distance)/(2*PI*RADIUS_BIG)
         if (row_slot == 0):
             rotation_in_degrees = 84
         elif (row_slot == 1):
@@ -73,7 +77,7 @@ def piston_y_axis(row_slot):
         else :
             print("Incorrect index for col.")
             exit()
-        move_piston(rotation_in_degrees, motor2)
+        move_piston(rotation_in_degrees, SWEEPER)
     except BaseException as e:
         print(e)
         exit()
@@ -91,38 +95,27 @@ def move_piston(rotation_in_degrees, aMotor):
         print(e)
         exit()
 
-if __name__=='__main__':
-    drawing = ""
-    motor1.offset_encoder(0)
-    motor2.offset_encoder(0)
-    while True:
-        if (len(drawing) > num_pixels):
-            break
-        if (TOUCH_SENSOR1.is_pressed() and TOUCH_SENSOR2.is_pressed()):
-            sleep(0.5)
-            drawing = input("Please enter the array of 1s and 0s for the canvas:")
-            break
-        if (TOUCH_SENSOR1.is_pressed() and not TOUCH_SENSOR2.is_pressed()):
-            sleep(0.5)
-            drawing += '1'
-            print(drawing)
-        if (not TOUCH_SENSOR1.is_pressed() and TOUCH_SENSOR2.is_pressed()):
-            sleep(0.5)
-            drawing += '0'
-            print(drawing)
-    number_of_cubes = drawing.count('1')
-    if number_of_cubes > 15: 
-        raise Exception("Maximum number of cubes is 15. Please try again")
-    reversedInput = drawing[::-1]
-    slot_counter = num_col - 1
-    row_counter = num_row - 1
-    for binary in reversedInput:
+if __name__=="__main__":
+    drawing = button_input(
+        DRAW_0_BTN,
+        DRAW_1_BTN,
+        NUM_PIXELS,
+        reverse_drawing=True,
+        polling_rate=BTN_POLLING_PERIOD,
+    )
+    col_counter = NUM_COL - 1
+    row_counter = NUM_ROW - 1
+    for binary in drawing:
         if binary == "1":
-            piston_x_axis(slot_counter)
-        if binary == "0":
-            num_row -= 1
-        if slot_counter == 0:
-            slot_counter = num_col
+            piston_x_axis(col_counter)
+        elif binary == "0":
+            NUM_ROW -= 1
+        else:
+            print("Something unexpected happened.")
+
+        if col_counter == 0:
+            col_counter = NUM_COL
             piston_y_axis(row_counter)
             row_counter -= 1
-        slot_counter -= 1
+
+        col_counter -= 1
