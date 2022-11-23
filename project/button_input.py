@@ -14,14 +14,14 @@ def button_input(
         if len(drawing) > num_pixels:
             break
         elif draw_0_btn.is_pressed() and draw_1_btn.is_pressed():
-            input("Please enter the array of 1s and 0s for the canvas:")
+            drawing = input(
+                "Please enter the array of 1s and 0s for the canvas:"
+            )
             break
         elif draw_0_btn.is_pressed() and not draw_1_btn.is_pressed():
             drawing += "1"
-        elif not draw_0_btn.is_pressed() and draw_1_btn.is_pressed():
+        elif draw_1_btn.is_pressed():
             drawing += "0"
-        else:
-            print("Something unexpected happened.")
         
         if debug:
             print(drawing)
@@ -36,5 +36,3 @@ def button_input(
         drawing = drawing[::-1]
     
     return drawing
-    
-    
