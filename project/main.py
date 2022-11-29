@@ -107,6 +107,7 @@ if __name__=="__main__":
     characters = set(drawing)
     if not (binary == characters or characters == {'0'} or characters == {'1'}) or len(input) > 25:
         print("Incorrect input: input must be binary and a size of 25.")
+        exit()
     col_counter = NUM_COL - 1
     row_counter = NUM_ROW - 1
     for binary in drawing:
