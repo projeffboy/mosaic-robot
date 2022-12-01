@@ -18,7 +18,7 @@ motor1 = Motor("A")
 #motor2.set_limits(dps=360)
 
 # CONFIGS
-init_D_x = 8.8
+init_D_x = 9
 radius_big = 2.1
 pixel_width = 4
 pixel_height = 4
