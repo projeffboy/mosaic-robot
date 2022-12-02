@@ -20,6 +20,7 @@ class ButtonInput:
         self,
         draw_0_btn_port,
         draw_1_btn_port,
+        start_btn_port,
         num_cols,
         num_rows,
         reverse_col=True,
@@ -30,6 +31,7 @@ class ButtonInput:
         # INIT I/O
         self.draw_0_btn = TouchSensor(draw_0_btn_port)
         self.draw_1_btn = TouchSensor(draw_1_btn_port)
+        self.start_btn = TouchSensor(start_btn_port)
         wait_ready_sensors(True) # True to print out debug stuff
         self.is_pressed = {
             "draw_0_btn": {
@@ -40,8 +42,11 @@ class ButtonInput:
                 "btn": self.draw_1_btn,
                 "is_pressed": False,
             },
+            "start_btn": {
+                "btn": self.start_btn,
+                "is_pressed": False,
+            }
         }
-
         self.num_cols = num_cols
         self.num_rows = num_rows
         self.reverse_col = reverse_col
@@ -56,6 +61,7 @@ class ButtonInput:
             pressed = True
             draw_0 = self.__is_just_pressed("draw_0_btn")
             draw_1 = self.__is_just_pressed("draw_1_btn")
+            start = self.__is_just_pressed("start_btn")
             if len(self.drawing) >= self.__num_pixels():
                 break
             elif draw_0 and draw_1:
@@ -65,6 +71,9 @@ class ButtonInput:
                 self.drawing += "1"
             elif draw_0:
                 self.drawing += "0"
+            elif start:
+                while (len(self.drawing) < 25):
+                    self.drawing += "0"
             else:
                 pressed = False
             

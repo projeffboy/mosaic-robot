@@ -13,11 +13,14 @@ class Arms():
     PIXEL_WIDTH_CM = 4
     PIXEL_HEIGHT_CM = 4
     PI = 3.14159264
+    
 
+    
     def __init__(self, pusher_port, sweeper_port, drawing, num_col, num_row):
         self.drawing = drawing
         self.num_col = num_col
         self.num_row = num_row
+        self.cube_count = 0
 
         # INIT I/O
         self.pusher = Motor(pusher_port)
@@ -51,9 +54,11 @@ class Arms():
             exit()
 
         try:
-            rotations_in_deg = [436, 545, 654, 763, 872]
-            rotation_in_deg = rotations_in_deg[col]
+            #rotations_in_deg = [436, 545, 654, 763, 872]
+            rotations_in_deg = [325, 436, 545, 654, 755]
+            rotation_in_deg = rotations_in_deg[col] - (self.cube_count)
             self.__move_piston(rotation_in_deg, self.pusher)
+            self.cube_count += 1
             # init_distance = INIT_D_X
             # pushing_distance = init_distance + ((col_slot) * PIXEL_WIDTH_CM)
             # rotation_in_degrees = (360 * pushing_distance)/(2*PI*RADIUS_BIG)
