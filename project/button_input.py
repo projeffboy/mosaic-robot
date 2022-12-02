@@ -15,50 +15,110 @@ Button Input Component
 from time import sleep
 from utils.brick import TouchSensor, wait_ready_sensors
 
-# CONFIG/CONSTANTS
-DRAW_0_BTN = TouchSensor(1)
-DRAW_1_BTN = TouchSensor(2)
-POLLING_PERIOD = 0.5
+class ButtonInput:
+    def __init__(
+        self,
+        draw_0_btn_port,
+        draw_1_btn_port,
+        num_pixels,
+        reverse_drawing=False,
+        debug=False,
+        polling_period=0.1,
+        max_blocks=15,
+    ):
+        # INIT I/O
+        self.draw_0_btn = TouchSensor(draw_0_btn_port)
+        self.draw_1_btn = TouchSensor(draw_1_btn_port)
+        wait_ready_sensors(True) # True to print out debug stuff
+        self.is_pressed = {
+            "draw_0_btn": {
+                "btn": self.draw_0_btn,
+                "is_pressed": False,
+            },
+            "draw_1_btn": {
+                "btn": self.draw_1_btn,
+                "is_pressed": False,
+            },
+        }
 
-wait_ready_sensors(True) # set to True to print out helpful stuff
+        self.num_pixels = num_pixels
+        self.reverse_drawing = reverse_drawing
+        self.debug = debug
+        self.polling_period = polling_period
+        self.max_blocks = max_blocks
 
-def input_drawing(num_pixels, reverse_drawing=False, debug=False):
-    drawing = ""
+        self.drawing = ""
 
-    while True:
-        pressed = True
-        if len(drawing) > num_pixels:
-            break
-        elif DRAW_0_BTN.is_pressed() and DRAW_1_BTN.is_pressed():
-            while True:
-                drawing = input(
-                    "Please enter the array of 1s and 0s for the canvas:"
-                )
-                if debug:
-                    print(drawing)
-                if set(drawing).issubset({'0', '1'}): # check that only 1s and 0s
-                    drawing = drawing.ljust(20, "0")
-                    break
-                else:
-                    print("Invalid input.")
-            break
-        elif DRAW_0_BTN.is_pressed() and not DRAW_1_BTN.is_pressed():
-            drawing += "1"
-        elif DRAW_1_BTN.is_pressed():
-            drawing += "0"
-        else:
-            pressed = False
+    def input_drawing(self):
+        while True:
+            pressed = True
+            draw_0 = self.__is_just_pressed("draw_0_btn")
+            draw_1 = self.__is_just_pressed("draw_1_btn")
+            if len(self.drawing) >= self.num_pixels:
+                break
+            elif draw_0 and draw_1:
+                self.__terminal_input()
+                break
+            elif not draw_0 and draw_1:
+                self.drawing += "1"
+            elif draw_0:
+                self.drawing += "0"
+            else:
+                pressed = False
+            
+            sleep(self.polling_period)
+            if self.debug and pressed:
+                print(self.drawing)
+            
+            if self.__too_much_blocks():
+                self.__too_much_blocks_msg()
+                self.drawing = ""
+
+
+        if self.__too_much_blocks():
+            raise Exception("Maximum number of cubes is 15. Please try again")
+
+        if self.reverse_drawing:
+            self.drawing = self.drawing[::-1]
         
-        sleep(POLLING_PERIOD)
-        if debug and pressed:
-            print(drawing)
+        return self.drawing
 
+    def __is_just_pressed(self, btnName):
+        btn = self.is_pressed[btnName]["btn"]
+        is_pressed_old = self.is_pressed[btnName]["is_pressed"]
+        is_pressed = btn.is_pressed()
+        output = is_pressed and not is_pressed_old
+        self.is_pressed[btnName]["is_pressed"] = is_pressed
+        return output
 
-    number_of_cubes = drawing.count("1")
-    if number_of_cubes > 15:
-        raise Exception("Maximum number of cubes is 15. Please try again")
+    def __too_much_blocks(self):
+        number_of_cubes = self.drawing.count("1")
+        return number_of_cubes > self.max_blocks
 
-    if reverse_drawing:
-        drawing = drawing[::-1]
-    
-    return drawing
+    def __terminal_input(self):
+        print("(starting from 1st row, 1st column, going left to right, then top to bottom)")
+        while True:
+            self.drawing = input(
+                "Please enter a string of 1s and 0s for the canvas:"
+            )
+            if self.debug:
+                print(self.drawing)
+            # check 1
+            if set(self.drawing).issubset({'0', '1'}): # check that only 1s and 0s
+                self.drawing = self.drawing.ljust(self.num_pixels, "0")
+            else:
+                print("Invalid input.")
+                continue
+            # check 2
+            if len(self.drawing) > self.num_pixels:
+                print("Your string is too long")
+                continue
+            #  check 3
+            if self.__too_much_blocks():
+                __too_much_blocks_msg()
+                continue
+            else:
+                break
+
+    def __too_much_blocks_msg():
+        print(f"You can only draw with up to {self.max_blocks} blocks, try again.")

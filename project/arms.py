@@ -7,8 +7,6 @@ from utils.brick import Motor
 
 class Arms():
     # CONFIG/CONSTANTS
-    PUSHER = Motor("A")
-    SWEEPER = Motor("D")
     INIT_D_Y = 3
     INIT_D_X = 16
     RADIUS_BIG = 2.1
@@ -16,14 +14,16 @@ class Arms():
     PIXEL_HEIGHT_CM = 4
     PI = 3.14159264
 
-    def __init__(self, drawing, num_col, num_row):
+    def __init__(self, pusher_port, sweeper_port, drawing, num_col, num_row):
         self.drawing = drawing
         self.num_col = num_col
         self.num_row = num_row
 
         # INIT I/O
-        self.PUSHER.offset_encoder(0)
-        self.SWEEPER.offset_encoder(0)
+        self.pusher = Motor(pusher_port)
+        self.sweeper = Motor(sweeper_port)
+        self.pusher.offset_encoder(0)
+        self.sweeper.offset_encoder(0)
 
     def draw(self):
         col = self.num_col - 1
@@ -49,7 +49,7 @@ class Arms():
         try:
             rotations_in_deg = [436, 545, 654, 763, 872]
             rotation_in_deg = rotations_in_deg[col]
-            self.__move_piston(rotation_in_deg, self.PUSHER)
+            self.__move_piston(rotation_in_deg, self.pusher)
             # init_distance = INIT_D_X
             # pushing_distance = init_distance + ((col_slot) * PIXEL_WIDTH_CM)
             # rotation_in_degrees = (360 * pushing_distance)/(2*PI*RADIUS_BIG)
@@ -66,7 +66,7 @@ class Arms():
             rotations_in_deg = [84, 193, 302, 411, 520]
             rotation_in_deg = rotations_in_deg[row]
 
-            self.__move_piston(rotation_in_deg, self.SWEEPER)
+            self.__move_piston(rotation_in_deg, self.sweeper)
             # init_distance = INIT_D_Y
             #pushing_distance = init_distance + ((row_slot) * pixel_width)
             #rotation_in_degrees = (360 * pushing_distance)/(2*PI*RADIUS_BIG)
