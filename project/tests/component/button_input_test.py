@@ -14,16 +14,16 @@ DRAW_0_BTN_PORT = 1
 DRAW_1_BTN_PORT = 2
 
 # CONFIG/CONSTANTS
-NUM_COL = 5
-NUM_ROW = 5
-NUM_PIXELS = NUM_COL * NUM_ROW
+NUM_COLS = 5
+NUM_ROWS = 5
 
 btnInput = ButtonInput(
     DRAW_0_BTN_PORT,
     DRAW_1_BTN_PORT,
-    NUM_PIXELS,
-    reverse_drawing=True,
-    debug=True
+    NUM_COLS,
+    NUM_ROWS,
+    reverse_col=True,
+    debug=True,
 )
 drawing = btnInput.input_drawing()
 print("TEST OUTPUT:", drawing)

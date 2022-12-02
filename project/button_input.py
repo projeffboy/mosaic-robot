@@ -20,8 +20,8 @@ class ButtonInput:
         self,
         draw_0_btn_port,
         draw_1_btn_port,
-        num_col,
-        num_row,
+        num_cols,
+        num_rows,
         reverse_col=True,
         debug=False,
         polling_period=0.1,
@@ -42,8 +42,8 @@ class ButtonInput:
             },
         }
 
-        self.num_col = num_col
-        self.num_row = num_row
+        self.num_cols = num_cols
+        self.num_rows = num_rows
         self.reverse_col = reverse_col
         self.debug = debug
         self.polling_period = polling_period
@@ -56,7 +56,7 @@ class ButtonInput:
             pressed = True
             draw_0 = self.__is_just_pressed("draw_0_btn")
             draw_1 = self.__is_just_pressed("draw_1_btn")
-            if len(self.drawing) >= self.num_pixels:
+            if len(self.drawing) >= self.__num_pixels():
                 break
             elif draw_0 and draw_1:
                 self.__terminal_input()
@@ -81,12 +81,14 @@ class ButtonInput:
             raise Exception("Maximum number of cubes is 15. Please try again")
 
         if self.reverse_col:
+            drawing_arr = list(self.drawing)
             for row in range(self.num_rows):
-                start = row * self.num_col
-                end = start + self.num_col
-                row_pixels = self.drawing[start:end].reverse()
-                self.drawing[start:end] = row_pixels
-            self.drawing
+                start = row * self.num_cols
+                end = start + self.num_cols
+                row_pixels = drawing_arr[start:end]
+                row_pixels.reverse()
+                drawing_arr[start:end] = row_pixels
+            self.drawing = "".join(drawing_arr)
         
         return self.drawing
 
@@ -128,7 +130,7 @@ class ButtonInput:
                 break
 
     def __num_pixels(self):
-        return self.num_row * self.num_col
+        return self.num_rows * self.num_cols
 
     def __too_much_blocks_msg(self):
         print(f"You can only draw with up to {self.max_blocks} blocks, try again.")

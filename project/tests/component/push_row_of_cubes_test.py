@@ -19,6 +19,6 @@ NUM_ROW = 5
 NUM_PIXELS = NUM_COL * NUM_ROW
 
 if __name__=="__main__":
-    drawing = "1111100000111110000011111"
+    drawing = "0000000000000000000011111"
     arms = Arms(PUSHER_PORT, SWEEPER_PORT, drawing, NUM_COL, NUM_ROW)
     arms.draw()
