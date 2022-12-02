@@ -12,9 +12,9 @@ from utils.sound import Sound
 
 class Ultrasonic:
     def get_us_sensor():
-        Note1 = Sound(duration=0.2, volume=96, pitch="C3")
-        Note2 = Sound(duration=0.2, volume=96, pitch="D3")
-        Note3 = Sound(duration=0.2, volume=96, pitch="E3")
+        Note1 = Sound(duration=0.1, volume=96, pitch="C3")
+        Note2 = Sound(duration=0.1, volume=96, pitch="D3")
+        Note3 = Sound(duration=0.1, volume=96, pitch="E3")
         
         BP = brickpi3.BrickPi3()
         US_SENSOR = BP.PORT_4
@@ -44,6 +44,3 @@ class Ultrasonic:
                 Note3.play()
                 Note3.wait_done()
                 return True
-
-
-

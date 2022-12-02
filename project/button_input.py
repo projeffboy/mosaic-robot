@@ -1,19 +1,23 @@
 """
 Button Input Component
 
-- three buttons and one motor
-- motor is up
+- three buttons S1,2,3
     - S1: draw 0
     - S2: draw 1
     - S3: start
     - S1&2: terminal input
-- motor is down
-    - S1: undo
-    - S2: restart drawing (even while drawing)
+- one motor M (if we have time)
+    - move M stick up: restart button input, auto moves M back in place
+    - move M stick down: undo last draw input, auto moves M back in place
 """
 
 from time import sleep
 from utils.brick import TouchSensor, wait_ready_sensors
+from sound import Sound
+
+class DummySound():
+    def play(self):
+        pass
 
 class ButtonInput:
     def __init__(
@@ -24,9 +28,11 @@ class ButtonInput:
         num_cols,
         num_rows,
         reverse_col=True,
-        debug=False,
+        reverse_row=True,
         polling_period=0.1,
         max_blocks=15,
+        sound=False,
+        debug=False,
     ):
         # INIT I/O
         self.draw_0_btn = TouchSensor(draw_0_btn_port)
@@ -50,11 +56,17 @@ class ButtonInput:
         self.num_cols = num_cols
         self.num_rows = num_rows
         self.reverse_col = reverse_col
+        self.reverse_row = reverse_row
         self.debug = debug
         self.polling_period = polling_period
         self.max_blocks = max_blocks
 
         self.drawing = ""
+
+        self.sound = DummySound()
+        if sound:
+            self.sound = Sound()
+
 
     def input_drawing(self):
         while True:
@@ -68,8 +80,10 @@ class ButtonInput:
                 self.__terminal_input()
                 break
             elif not draw_0 and draw_1:
+                self.sound.play("one")
                 self.drawing += "1"
             elif draw_0:
+                self.sound.play("zero")
                 self.drawing += "0"
             elif start:
                 while (len(self.drawing) < 25):
@@ -98,6 +112,14 @@ class ButtonInput:
                 row_pixels.reverse()
                 drawing_arr[start:end] = row_pixels
             self.drawing = "".join(drawing_arr)
+        
+        if self.reverse_row:
+            drawing_arr = list(self.drawing)
+            for col in range(self.num_cols):
+                start = col * self.num_rows
+                col_pixels = drawing_arr[start::self.num_cols]
+                col_pixels.reverse()
+                drawing_arr[start::self.num_cols] = col_pixels
         
         return self.drawing
 

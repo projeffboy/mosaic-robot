@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 
-"""
-Test pushing a row of cubes
-"""
+# Software Components involved: pusher, sweeper
 
 import sys
 from os.path import dirname, join, abspath

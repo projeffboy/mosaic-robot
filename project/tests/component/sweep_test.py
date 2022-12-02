@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 
-"""
-Test pushing one cube
-"""
+# Component: Sweeper
 
 import sys
 from os.path import dirname, join, abspath

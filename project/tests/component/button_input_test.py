@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 
-"""
-Test the button input component
-"""
+# Component: Button Input
 
 import sys
 from os.path import dirname, join, abspath

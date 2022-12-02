@@ -28,5 +28,3 @@ class Color:
             sleep(1) # delay seconds
             if (rgb_values != "Unknown"):
                 return True
-                
-
