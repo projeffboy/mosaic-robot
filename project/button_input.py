@@ -1,5 +1,15 @@
 """
 Button Input Component
+
+- three buttons and one motor
+- motor is up
+    - S1: draw 0
+    - S2: draw 1
+    - S3: start
+    - S1&2: terminal input
+- motor is down
+    - S1: undo
+    - S2: restart drawing (even while drawing)
 """
 
 from time import sleep
@@ -20,11 +30,17 @@ def input_drawing(num_pixels, reverse_drawing=False, debug=False):
         if len(drawing) > num_pixels:
             break
         elif DRAW_0_BTN.is_pressed() and DRAW_1_BTN.is_pressed():
-            drawing = input(
-                "Please enter the array of 1s and 0s for the canvas:"
-            )
-            if debug:
-                print(drawing)
+            while True:
+                drawing = input(
+                    "Please enter the array of 1s and 0s for the canvas:"
+                )
+                if debug:
+                    print(drawing)
+                if set(drawing).issubset({'0', '1'}): # check that only 1s and 0s
+                    drawing = drawing.ljust(20, "0")
+                    break
+                else:
+                    print("Invalid input.")
             break
         elif DRAW_0_BTN.is_pressed() and not DRAW_1_BTN.is_pressed():
             drawing += "1"
