@@ -28,20 +28,24 @@ class Arms():
     def draw(self):
         col = self.num_col - 1
         row = self.num_row - 1
+        empty_row = True
         for binary in self.drawing:
             if binary == "1":
-                self.__piston_x_axis(col)
+                self.piston_x_axis(col)
+                empty_row = False
             elif binary != "0":
                 print("Something unexpected happened.")
 
             if col == 0:
                 col = self.num_col
-                self.__piston_y_axis(row)
+                if not empty_row:
+                    self.piston_y_axis(row)
+                empty_row = True
                 row -= 1
 
             col -= 1
 
-    def __piston_x_axis(self, col):
+    def piston_x_axis(self, col):
         if (col < 0 or col > self.num_col):
             print(col + " is an invalid column slot.")
             exit()
@@ -57,13 +61,13 @@ class Arms():
             print(e)
             exit()
 
-    def __piston_y_axis(self, row):
-        if (row < 0 or row >= self.NUM_ROW):
+    def piston_y_axis(self, row):
+        if (row < 0 or row >= self.num_row):
             print(str(row) + " is an invalid row slot.")
             exit()
 
         try:
-            rotations_in_deg = [84, 193, 302, 411, 520]
+            rotations_in_deg = [0, 193, 302, 411, 520]
             rotation_in_deg = rotations_in_deg[row]
 
             self.__move_piston(rotation_in_deg, self.sweeper)

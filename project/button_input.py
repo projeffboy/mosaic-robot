@@ -20,8 +20,9 @@ class ButtonInput:
         self,
         draw_0_btn_port,
         draw_1_btn_port,
-        num_pixels,
-        reverse_drawing=False,
+        num_col,
+        num_row,
+        reverse_col=True,
         debug=False,
         polling_period=0.1,
         max_blocks=15,
@@ -41,8 +42,9 @@ class ButtonInput:
             },
         }
 
-        self.num_pixels = num_pixels
-        self.reverse_drawing = reverse_drawing
+        self.num_col = num_col
+        self.num_row = num_row
+        self.reverse_col = reverse_col
         self.debug = debug
         self.polling_period = polling_period
         self.max_blocks = max_blocks
@@ -78,8 +80,13 @@ class ButtonInput:
         if self.__too_much_blocks():
             raise Exception("Maximum number of cubes is 15. Please try again")
 
-        if self.reverse_drawing:
-            self.drawing = self.drawing[::-1]
+        if self.reverse_col:
+            for row in range(self.num_rows):
+                start = row * self.num_col
+                end = start + self.num_col
+                row_pixels = self.drawing[start:end].reverse()
+                self.drawing[start:end] = row_pixels
+            self.drawing
         
         return self.drawing
 
@@ -105,20 +112,23 @@ class ButtonInput:
                 print(self.drawing)
             # check 1
             if set(self.drawing).issubset({'0', '1'}): # check that only 1s and 0s
-                self.drawing = self.drawing.ljust(self.num_pixels, "0")
+                self.drawing = self.drawing.ljust(self.__num_pixels(), "0")
             else:
                 print("Invalid input.")
                 continue
             # check 2
-            if len(self.drawing) > self.num_pixels:
+            if len(self.drawing) > self.__num_pixels():
                 print("Your string is too long")
                 continue
             #  check 3
             if self.__too_much_blocks():
-                __too_much_blocks_msg()
+                self.__too_much_blocks_msg()
                 continue
             else:
                 break
 
-    def __too_much_blocks_msg():
+    def __num_pixels(self):
+        return self.num_row * self.num_col
+
+    def __too_much_blocks_msg(self):
         print(f"You can only draw with up to {self.max_blocks} blocks, try again.")
