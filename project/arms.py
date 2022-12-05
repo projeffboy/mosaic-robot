@@ -4,24 +4,26 @@ Pusher and sweeper components
 
 from time import sleep
 from utils.brick import Motor
+from sound import Sound, DummySound
 
 class Arms():
-    # CONFIG/CONSTANTS
-    INIT_D_Y = 3
-    INIT_D_X = 16
-    RADIUS_BIG = 2.1
-    PIXEL_WIDTH_CM = 4
-    PIXEL_HEIGHT_CM = 4
-    PI = 3.14159264
-    
-
-    
-    def __init__(self, pusher_port, sweeper_port, drawing, num_col, num_row):
+    def __init__(
+        self,
+        pusher_port,
+        sweeper_port,
+        drawing,
+        num_col,
+        num_row,
+        sound = False
+    ):
         self.drawing = drawing
         self.num_col = num_col
         self.num_row = num_row
         self.cube_count = 0
-
+        self.sound = DummySound()
+        if sound:
+            self.sound = Sound()
+        
         # INIT I/O
         self.pusher = Motor(pusher_port)
         self.sweeper = Motor(sweeper_port)
@@ -47,6 +49,7 @@ class Arms():
                 row -= 1
 
             col -= 1
+        self.sound.play("complete")
 
     def piston_x_axis(self, col):
         if (col < 0 or col > self.num_col):
@@ -59,9 +62,6 @@ class Arms():
             rotation_in_deg = rotations_in_deg[col] - (self.cube_count)
             self.__move_piston(rotation_in_deg, self.pusher)
             self.cube_count += 1
-            # init_distance = INIT_D_X
-            # pushing_distance = init_distance + ((col_slot) * PIXEL_WIDTH_CM)
-            # rotation_in_degrees = (360 * pushing_distance)/(2*PI*RADIUS_BIG)
         except BaseException as e:
             print(e)
             exit()
@@ -76,9 +76,6 @@ class Arms():
             rotation_in_deg = rotations_in_deg[row]
 
             self.__move_piston(rotation_in_deg, self.sweeper)
-            # init_distance = INIT_D_Y
-            #pushing_distance = init_distance + ((row_slot) * pixel_width)
-            #rotation_in_degrees = (360 * pushing_distance)/(2*PI*RADIUS_BIG)
         except BaseException as e:
             print(e)
             exit()
